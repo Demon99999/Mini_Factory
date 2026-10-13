@@ -1,0 +1,58 @@
+# Использование AI при разработке Mini Factory
+
+## Какие AI-инструменты использовались
+
+- **Claude (Anthropic)** — основной инструмент: генерация кода, архитектурные обсуждения, ревью, отладка ошибок.
+- **Rider AI Assistant** — точечные подсказки по API Unity и Zenject.
+
+## Какие задачи передавались AI
+
+- Генерация boilerplate-кода для сервисов: `EconomyService`, `MachineService`, `BoostService`, `OfflineProgressService`, `GameLoopService`.
+- Черновик `UnityIAPService` под Unity IAP v5 (событийная модель `StoreController` вместо `IStoreListener`).
+- Написание EditMode-тестов (NUnit) для сервисов.
+- Разбор ошибок Zenject (`Unable to resolve 'PurchaseCoordinator'`, `FromComponentInHierarchy`).
+
+## Несколько ключевых промптов
+
+1. «Сделай сервис машин с unlock/upgrade, событием OnStateChanged и использованием IPersistentProgress».
+2. «Перепиши UnityIAPService под Unity IAP v5 — событийная модель StoreController, обязательный ConfirmPurchase».
+3. «Почему Zenject падает с FromComponentInHierarchy при старте ProjectContext?»
+
+## Что реализовано с помощью AI
+
+- Костяк сервисов: `EconomyService`, `MachineService`, `BoostService`, `OfflineProgressService`, `GameLoopService`.
+- Черновик `UnityIAPService` (v5) и `PurchaseCoordinator`.
+
+## Что сделано самостоятельно
+
+- **Архитектура**: выбор Zenject + GameStateMachine + GlobalInstaller/GameInstaller, разделение на слои (Infrastructure / StaticData / Progress / Gameplay / UI).
+- **Интеграция с Zenject**: ручная настройка `ProjectContext`, `SceneContext`, порядок биндов, решение проблемы с `ICoroutineRunner`.
+- **Правки кода после AI**: сигнатуры, `using`, обработка edge cases (`focusChanged`, restore boost, offline).
+- **Сборка UI**: `MachineView`, `TopBarView`, `FactoryView`, `BuyCoinsButton`, ручное заполнение ссылок в инспекторе.
+- **Конфиги**: создание `MachinesConfig`, `BoostSettings`, `OfflineSettings`, их балансировка.
+- **Отладка**: разбор стектрейсов Zenject, EventSystem, NRE в `TopBarView`/`FactoryView`, IAP v5.
+- **Сцены**: `Bootstrap.unity` + `Game.unity`, `EventSystem`, Canvas, Layout Group, Build Settings.
+- **Git**: структура коммитов, `.gitignore`, финальная проверка.
+
+## Какие предложения AI были изменены или отклонены
+
+- **`JsonUtility` для сохранений** — отклонено: не поддерживает `Dictionary` и сложные вложенные структуры. Заменено на **Newtonsoft.Json**.
+- **Хранение состояния машин в статических полях `MachineService`** — отклонено: состояние перенесено в `PlayerProgress`, что упрощает save/load.
+- **`FromComponentInHierarchy` для `ICoroutineRunner` в `GlobalInstaller`** — привело к ошибке `Could not find any component with type 'ICoroutineRunner'`. Бинд перенесён в `BootstrapInstaller` в сцене `Bootstrap` / `FromInstance` с `[SerializeField]`.
+- **`UnityIAPService` под v4** (`IDetailedStoreListener`, `ConfigurationBuilder`) — не скомпилировалось на v5. Код переписан под событийную модель v5 (`StoreController.OnPurchasePending`, `ConfirmPurchase`).
+- **NSubstitute в тестах** — отклонено из-за сложности подключения в Unity. Заменено на ручные `FakeStaticData`-классы.
+
+## Какие ошибки или спорные решения AI удалось обнаружить
+
+1. **Двойное начисление валюты за IAP**: `PurchaseCoordinator` и `UnityIAPService` оба начисляли монеты через `OnPurchaseCompleted`. Исправлено — начисление только в одном месте, плюс защита через `HashSet<TransactionID>`.
+2. **Инициализация IAP под v4**: `UnityPurchasing.Initialize` устарел. Заменено на `StoreController.Connect()` + ожидание `OnStoreConnected`.
+3. **Отсутствие `ConfirmPurchase(order)`** в первой v5-версии — критичная ошибка, приводила бы к повторным покупкам. Исправлено после сверки с документацией.
+4. **Сигнатура `StoreConnectionFailureDescription.Message`** — AI сначала использовал `.message` (с маленькой буквы). Свойство называется `.Message`.
+5. **`ResetProgress` при отсутствии сейва**: AI возвращал `null` без fallback. Добавлен `CreateNewProgress()`.
+6. **`asmdef` для тестов не был учтён** — без `Assembly Definition` тесты не собираются. Добавлено вручную.
+7. **`Active Input Handling`**: AI не сразу учёл, что при Input System нужно менять `StandaloneInputModule` на `InputSystemUIInputModule`. Исправлено после `InvalidOperationException`.
+8. **Порядок биндов Zenject** — AI изначально разместил `ICoroutineRunner` в `ProjectContext`, что ломало старт. Бинд перенесён в `BootstrapInstaller`.
+
+## Итог
+
+AI использовался как ускоритель рутинных задач и источник черновиков. Все архитектурные решения, интеграция, отладка и финальное ревью сделаны самостоятельно. Код, сгенерированный AI, проверялся, адаптировался и исправлялся под реальные условия проекта.
