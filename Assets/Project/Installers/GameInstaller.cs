@@ -5,6 +5,7 @@ using Project.Scripts.Gameplay.Economy;
 using Project.Scripts.Gameplay.Loop;
 using Project.Scripts.Gameplay.Machines;
 using Project.Scripts.Gameplay.Offline;
+using Project.Scripts.IAP;
 using Zenject;
 
 namespace Project.Installers
@@ -21,6 +22,9 @@ namespace Project.Installers
 
             Container.Bind<IAnalyticsService>().To<AnalyticsService>().AsSingle();
             Container.Bind<IAnalyticsProvider>().To<ConsoleAnalyticsProvider>().AsSingle();
+            
+            Container.Bind<IIAPSService>().To<UnityAPSService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<PurchaseCoordinator>().AsSingle();
 
             Container.BindInterfacesTo<GameplayBootstrapper>().AsSingle().NonLazy();
         }

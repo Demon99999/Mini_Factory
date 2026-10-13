@@ -6,11 +6,11 @@ using Zenject;
 
 namespace Project.Installers
 {
-    public class GlobalInstaller : MonoInstaller
+    public class GlobalInstaller : MonoInstaller, ICoroutineRunner
     {
         public override void InstallBindings()
         {
-            Container.Bind<ICoroutineRunner>().FromComponentInHierarchy().AsSingle();
+            Container.Bind<ICoroutineRunner>().FromInstance(this).AsSingle();
 
             Container.Bind<IAssetProvider>().To<AssetProvider>().AsSingle();
             Container.Bind<IStaticDataService>().To<StaticDataService>().AsSingle();

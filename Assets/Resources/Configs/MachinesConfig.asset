@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec26753c64e84bf482f7a273e152d0e0, type: 3}
+  m_Name: MachinesConfig
+  m_EditorClassIdentifier: MiniFactory::Project.Scripts.Config.MachinesConfig
+  _machines:
+  - Id: machine_1
+    DisplayName: Bakery
+    BaseProductionPerSecond: 1
+    ProductionPerLevel: 1
+    UnlockCost: 0
+    UpgradeCostBase: 10
+    UpgradeCostMultiplier: 1.5
+    UnlockedByDefault: 1
+    MaxLevel: 50
+  - Id: machine_2
+    DisplayName: Workshop
+    BaseProductionPerSecond: 5
+    ProductionPerLevel: 3
+    UnlockCost: 100
+    UpgradeCostBase: 50
+    UpgradeCostMultiplier: 1.6
+    UnlockedByDefault: 0
+    MaxLevel: 50
+  - Id: machine_3
+    DisplayName: Factory
+    BaseProductionPerSecond: 20
+    ProductionPerLevel: 10
+    UnlockCost: 1000
+    UpgradeCostBase: 250
+    UpgradeCostMultiplier: 1.7
+    UnlockedByDefault: 0
+    MaxLevel: 50
