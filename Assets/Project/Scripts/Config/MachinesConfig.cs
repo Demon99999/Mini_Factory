@@ -8,5 +8,9 @@ namespace Project.Scripts.Config
         [SerializeField] private MachineConfig[] _machines;
         
         public MachineConfig[] Machines => _machines;
+        
+#if UNITY_EDITOR
+        public void SetMachines(MachineConfig[] machines) => _machines = machines;
+#endif
     }
 }

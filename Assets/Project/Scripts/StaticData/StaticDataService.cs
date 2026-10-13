@@ -9,6 +9,7 @@ namespace Project.Scripts.StaticData
     {
         private readonly IAssetProvider _assets;
         private Dictionary<string, MachineConfig> _machinesById;
+        private IReadOnlyList<MachineConfig> _allMachinesCache;
 
         public MachinesConfig MachinesConfig { get; private set; }
         public BoostConfig BoostConfig { get; private set; }
@@ -23,6 +24,7 @@ namespace Project.Scripts.StaticData
         {
             MachinesConfig = _assets.Load<MachinesConfig>(StaticDataConfigsPath.MachinesConfig);
             _machinesById = MachinesConfig.Machines.ToDictionary(m => m.Id, m => m);
+            _allMachinesCache = _machinesById.Values.ToList();
 
             BoostConfig = _assets.Load<BoostSettingsConfig>(StaticDataConfigsPath.BoostSettings).Boost;
             OfflineConfig = _assets.Load<OfflineSettingsConfig>(StaticDataConfigsPath.OfflineSettings).Offline;
@@ -30,5 +32,8 @@ namespace Project.Scripts.StaticData
 
         public MachineConfig GetMachine(string id)
             => _machinesById.TryGetValue(id, out var m) ? m : null;
+        
+        public IReadOnlyList<MachineConfig> GetAllMachines()
+            => _allMachinesCache;
     }
 }

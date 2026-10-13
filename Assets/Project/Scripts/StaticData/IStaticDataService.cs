@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Project.Scripts.Config;
 
 namespace Project.Scripts.StaticData
@@ -9,6 +10,7 @@ namespace Project.Scripts.StaticData
         OfflineConfig OfflineConfig { get; }
 
         MachineConfig GetMachine(string id);
+        IReadOnlyList<MachineConfig> GetAllMachines();
         void Initialize();
     }
 }

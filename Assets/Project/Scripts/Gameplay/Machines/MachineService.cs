@@ -24,7 +24,7 @@ namespace Project.Scripts.Gameplay.Machines
         {
             _economy = economy;
             _progress = progress;
-            _configsById = staticData.MachinesConfig.Machines.ToDictionary(m => m.Id, m => m);
+            _configsById = staticData.GetAllMachines().ToDictionary(m => m.Id, m => m);
         }
 
         public MachineConfig GetConfig(string machineId)
